@@ -1,3 +1,16 @@
 .nav-title {
     margin: 0 auto;
 }
+
+.loading {
+    width: 4rem;
+    height: auto;
+}
+
+.check-box {
+    padding-right: 0;
+}
+
+.content-class {
+    padding-left: 0;
+}

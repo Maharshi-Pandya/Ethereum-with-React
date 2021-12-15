@@ -3,6 +3,8 @@ import Web3 from 'web3';
 import "./App.css";
 import { TODOLIST_ADDRESS, TODOLIST_ABI } from './config'; 
 
+import loading from './assets/loading.gif';
+
 // componentts
 import NavBar from './components/Navbar';
 import Header from './components/Header';
@@ -14,8 +16,12 @@ class App extends Component {
     this.state = {
       account: '',
       taskCount: 0,
-      tasks: []
+      tasks: [],
+      loading: true
     };
+
+    this.createTask = this.createTask.bind(this);
+    this.markAsDone = this.markAsDone.bind(this);
   }
 
   componentDidMount() {
@@ -24,10 +30,15 @@ class App extends Component {
 
   async loadBlockchainData() {
     // init web3 using provider metamask provides
-    const web3 = new Web3(Web3.givenProvider || 'http://localhost:8545');
+    const web3 = new Web3('http://localhost:8545');
+
+    const accounts = await web3.eth.getAccounts();
+    this.setState({ account : accounts[0] });
+    console.log(accounts[0]);
 
     // get the contract instance from web3
     const todoList = new web3.eth.Contract(TODOLIST_ABI, TODOLIST_ADDRESS);
+    this.setState({ todoList });
     console.log(todoList);
 
     // read taskCount from the contract
@@ -42,7 +53,23 @@ class App extends Component {
       });
     }
 
-    console.log(this.state.tasks);
+    this.setState({ loading: false });
+  }
+
+  createTask(content) {
+    this.setState({ loading: true });
+    this.state.todoList.methods.createTask(content).send({ from: this.state.account, gas: 600000 })
+    .once('receipt', (receipt) => {
+      this.setState({ loading: false });
+    });
+  }
+
+  markAsDone(taskId) {
+    this.setState({ loading: true });
+    this.state.todoList.methods.markTaskAsDone(taskId).send({ from: this.state.account, gas: 600000})
+    .once('receipt', (receipt) => {
+      this.setState({ loading: false });
+    });
   }
 
   render() {
@@ -53,7 +80,13 @@ class App extends Component {
         <div className="container">
           <Header taskCount={this.state.taskCount}/>
           <br/>
-          <Content tasks={this.state.tasks}/>
+          
+          {this.state.loading 
+          ? <div className="mt-5 text-center"><img className="loading" src={loading} alt="loading gif"></img></div>
+          : <Content tasks={this.state.tasks}
+          createTask={this.createTask}
+          markAsDone={this.markAsDone}
+          />}
         </div>
       </div>
     );

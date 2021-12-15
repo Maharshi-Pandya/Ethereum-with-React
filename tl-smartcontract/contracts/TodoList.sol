@@ -21,17 +21,9 @@ contract TodoList {
         tasks[taskCount] = Task(taskCount, _content, false);
     }
 
-    function readTask(uint id) view public returns(uint, string memory, bool) {
-        Task storage task = tasks[id];
-        return (task.Id, task.Content, task.Done);
-    }
-
-    function markTaskAsDone(uint id) public {
-        require(id <= taskCount);
-        tasks[id].Done = true;
-    }
-
-    function deleteTask(uint id) public {
-        delete tasks[id];
+    function markTaskAsDone(uint _id) public {
+        Task memory _task = tasks[_id];
+        _task.Done = !_task.Done;
+        tasks[_id] = _task;
     }
 }

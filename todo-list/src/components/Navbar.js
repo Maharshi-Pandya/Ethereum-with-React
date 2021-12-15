@@ -5,7 +5,7 @@ class NavBar extends Component {
         return (
           <div>
               <nav className="navbar navbar-dark bg-dark p-0">
-              <a className="navbar-brand nav-title" href="#">Ethereum with React</a>
+              <a className="navbar-brand nav-title">Ethereum with React</a>
               </nav>
           </div>
         )
